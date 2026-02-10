@@ -31,8 +31,8 @@ We are currently iterating on the **Start Screen** layout. Based on our wirefram
 ---
 
 ## 🛠️ Tech Stack
-* **Language:** [Enter Language, e.g., Python / C#]
-* **Engine/Framework:** [Enter Framework, e.g., Pygame / Unity]
+* **Language:** [C#]
+* **Engine/Framework:** [ Unity]
 * **Version Control:** Git & GitHub
 
 ## 🤝 Contributing

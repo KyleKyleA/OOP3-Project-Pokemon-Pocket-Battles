@@ -35,6 +35,7 @@ We are currently iterating on the **Start Screen** layout. Based on our wirefram
 * **Engine/Framework:** [ Unity]
 * **Version Control:** Git & GitHub
 * **Design tools: ** Figma
+* **Project management: **Trello, Github.
 
 ## 🤝 Contributing
 We are currently in the early prototype phase and are **open to suggestions!** If you have ideas for balancing the point system or improving the UI flow, feel free to open an issue or submit a pull request.

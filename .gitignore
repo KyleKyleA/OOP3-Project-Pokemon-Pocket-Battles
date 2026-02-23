@@ -1,0 +1,45 @@
+# --- UNITY SPECIFIC IGNORES ---
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Mm]emoryCaptures/
+/[Uu]nityConfiguration/
+# Unity3D generated meta files for folders should be kept, 
+# but temporary ones should be ignored.
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# --- VISUAL STUDIO SPECIFIC (Your Old Rules) ---
+.vs/
+*.user
+*.userprefs
+*.suo
+*.sln.docstates
+*.csproj
+*.unityproj
+*.sln
+*.swp
+*.scc
+*.vspscc
+*.vssscc
+.builds
+
+# Build Results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+
+# --- FILE TYPES TO IGNORE ---
+*.log
+*.tmp
+*.tmp_proj
+*.cache
+*.opendb
+*.VC.db

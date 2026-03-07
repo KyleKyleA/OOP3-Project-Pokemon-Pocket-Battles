@@ -1,45 +1,34 @@
-# --- UNITY SPECIFIC IGNORES ---
-/[Ll]ibrary/
-/[Tt]emp/
-/[Oo]bj/
-/[Bb]uild/
-/[Bb]uilds/
+# --- Unity Essential Ignores ---
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
 /[Ll]ogs/
-/[Mm]emoryCaptures/
-/[Uu]nityConfiguration/
-# Unity3D generated meta files for folders should be kept, 
-# but temporary ones should be ignored.
-*.pidb.meta
-*.pdb.meta
-*.mdb.meta
+/[MemoryCaptures]/
 
-# --- VISUAL STUDIO SPECIFIC (Your Old Rules) ---
+# --- Ignore All Packages except the manifests ---
+# This stops the 100s of folders in image_82eace from uploading
+/[Pp]ackages/*
+!/[Pp]ackages/manifest.json
+!/[Pp]ackages/packages-lock.json
+
+# --- Visual Studio & OS ---
 .vs/
-*.user
-*.userprefs
-*.suo
-*.sln.docstates
+.gradle/
+ExportedObj/
+.consulo/
 *.csproj
 *.unityproj
 *.sln
-*.swp
-*.scc
-*.vspscc
-*.vssscc
-.builds
-
-# Build Results
-[Dd]ebug/
-[Rr]elease/
-x64/
-x86/
-[Bb]in/
-[Oo]bj/
-
-# --- FILE TYPES TO IGNORE ---
-*.log
-*.tmp
-*.tmp_proj
-*.cache
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.svd
+*.pdb
 *.opendb
 *.VC.db
+
+# --- Keep meta files for Assets ---
+!/[Aa]ssets/**/*.meta

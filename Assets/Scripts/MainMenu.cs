@@ -44,7 +44,7 @@ public class MainMenu : MonoBehaviour
 
     /// <summary>
     /// Function for exiting out of the application
-    /// 
+    /// on the mainmenu 
     /// </summary>
     public void exitButton()
     {
@@ -53,5 +53,13 @@ public class MainMenu : MonoBehaviour
 #else
         Application.Quit();
 #endif
+    }
+
+
+// Exit button function for exiting out of the decks section
+// of the game
+public void exitDeckButton()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }

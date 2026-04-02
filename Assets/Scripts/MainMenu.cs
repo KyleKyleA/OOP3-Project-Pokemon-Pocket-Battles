@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.TestTools;
 // Author: 
 // File:
 // Date Written:
@@ -48,13 +47,8 @@ public class MainMenu : MonoBehaviour
     /// </summary>
     public void exitButton()
     {
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
         Application.Quit();
-#endif
     }
-
 
 // Exit button function for exiting out of the decks section
 // of the game

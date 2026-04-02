@@ -1,5 +1,7 @@
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
+using System.Collections;
+using System.Collections.Generic;
 
 public class GameRules : MonoBehaviour
 {
@@ -10,15 +12,21 @@ public class GameRules : MonoBehaviour
     void Start()
     {
         ShowPage(1);
-    }
 
+    }
 
     public void ShowPage(int pageNumber)
     {
-        page1.SetActive(pageNumber == 1);
-        page2.SetActive(pageNumber == 2);
+        if (page1 != null) page1.SetActive(pageNumber == 1);
+        if (page2 != null) page2.SetActive(pageNumber == 2);
     }
 
     public void nextPage() => ShowPage(2);
     public void showPrevious() => ShowPage(1);
+
+
+    public void exitButton()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
 }

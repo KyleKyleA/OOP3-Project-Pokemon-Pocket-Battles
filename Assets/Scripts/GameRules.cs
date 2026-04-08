@@ -15,6 +15,10 @@ public class GameRules : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Testing function to show the different pages of the rules. In the future, this will be replaced by a more complex system that allows for more pages and better navigation.
+    /// </summary>
+    /// <param name="pageNumber"></param>
     public void ShowPage(int pageNumber)
     {
         if (page1 != null) page1.SetActive(pageNumber == 1);

@@ -5,6 +5,7 @@ using UnityEngine;
 // File: CoinFlip.cs
 // Description: Coin flip is responsbile for determining players turn at the beginning of the game
 // This only occurs at the start of the game.
+// Coin either hits heads or tails
 
 public class CoinFlip : MonoBehaviour
 {

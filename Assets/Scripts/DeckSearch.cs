@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
-using static DeckSearch;
-
+using UnityEngine.SceneManagement;
 // Author: Kyle Angeles
 // File: DeckSearch.cs
 // Date-Written: 2026/4/9 
@@ -11,23 +10,6 @@ using static DeckSearch;
 // Theirs a search bar or some sort of UI element that allows players to filter, sort by or search decks on the page 1
 // of decks. This is only used at the start screen of the game.
 // Declaring a method for PokemonCard
-public class pokemonCard
-{
-    public int cardId;
-    public byte[] image;
-    public string pokemonName;
-    public int hp;
-    public string pokemonType;
-    public int cardCategoryID;
-
-}
-
-[Serializable]
-public class CardListWrapper
-{
-    // List of decks that will be displayed on the screen and connected by json
-    public List<pokemonCard> Cards;
-}
 public class DeckSearch : MonoBehaviour
 {
 
@@ -35,7 +17,30 @@ public class DeckSearch : MonoBehaviour
 
     public TextField searchField;
     public VisualElement deckListContainer;
-    private List<pokemonCard> pokemonCard;
+   
+    private List<pokemonCard> cardList;
+    private pokemonCard selectedCard = null;
+    private Button confirmBtn;
+
+
+    [Serializable]
+    public class pokemonCard
+    {
+        public int cardId;
+        public byte[] image;
+        public string pokemonName;
+        public int hp;
+        public string pokemonType;
+        public int cardCategoryID;
+
+    }
+
+    [Serializable]
+    public class CardListWrapper
+    {
+        // List of decks that will be displayed on the screen and connected by json
+        public List<pokemonCard> cards;
+    }
 
     void Start()
     {
@@ -48,16 +53,61 @@ public class DeckSearch : MonoBehaviour
         // This would load the file from our json file 
         TextAsset jsonFile = Resources.Load<TextAsset>("PokemonCards");
 
-        if (jsonFile != null)
+        if (jsonFile == null)
         {
-            CardListWrapper data = JsonUtility.FromJson<CardListWrapper>(jsonFile.text);
-            pokemonCard = data.Cards;
-
-            Debug.Log($"Loaded {pokemonCard.Count} cards from JSON");
+            Debug.LogError($"Loaded {cardList.Count} cards from json");
+            return;
+               
         }
-        else
+
+        CardListWrapper data = JsonUtility.FromJson<CardListWrapper>(jsonFile.text);
+        cardList = data.cards;
+        Debug.Log("Failed to fetch json file");
+
+
+        var root = GetComponent<UIDocument>().rootVisualElement;
+
+
+        // Confirmed Selected deck before the game
+        confirmBtn = root.Q<Button>("confirm-button");
+        confirmBtn.SetEnabled(false);
+        confirmBtn.clicked += () => {
+
+            if (selectedCard == null) return;
+            SceneManager.LoadScene("MainMenu");
+        };
+
+
+        searchField = root.Q<TextField>("search-field");
+        searchField.RegisterValueChangedCallback(evt => filterDecks(evt.newValue));
+
+
+        deckListContainer = root.Q<VisualElement>("deck-list-container");
+
+        PopulateDeckList(cardList);
+       
+    }
+
+    // Populate decjs
+       void PopulateDeckList(List<pokemonCard> cards)
+    {
+        deckListContainer.Clear();
+
+        foreach (var card in cards)
         {
-            Debug.LogError("Failed to fetch json file");
+            var btn = new Button();
+            btn.AddToClassList("deck-card");
+
+            btn.Add(new Label(card.pokemonName));
+            btn.Add(new Label(card.pokemonType));
+            btn.Add(new Label("HP: " + card.hp));
+
+            var capturedCard = card;
+            var capturedBtn = btn;
+            btn.clicked += () => SelectDeck(capturedCard, capturedBtn);
+
+            deckListContainer.Add(btn);
+
         }
     }
 
@@ -68,11 +118,40 @@ public class DeckSearch : MonoBehaviour
     /// they start the game
     /// </summary>
     /// <param name="deck"></param>
-    void SelectDeck(pokemonCard deck)
+    void SelectDeck(pokemonCard card, Button btn)
     {
-        Debug.Log("Selected Deck: " + deck);
+
+        selectedCard = card;
+
+        // Remove highlight from all cards
+        deckListContainer.Query<Button>(className: "deck-card").ForEach(b =>
+        b.RemoveFromClassList("deck-card--selected"));
+
+        // Highlight the selected deck
+        btn.AddToClassList("deck-card--selected");
+
+       
+        // Save to DeckManager so it survives the scene change
+        DeckManager.Instance.SetSelectedDeck(card);
+
+        confirmBtn.SetEnabled(true);
+
+        Debug.Log("Deck selected: " + card.pokemonName);
 
 
+    }
+
+
+    // Search bar - Filter
+    void filterDecks(string query)
+    {
+        var filtered = string.IsNullOrEmpty(query)
+            ? cardList
+            : cardList.FindAll(c =>
+                c.pokemonName.ToLower().Contains(query.ToLower()) ||
+                c.pokemonType.ToLower().Contains(query.ToLower()));
+
+        PopulateDeckList(filtered);
     }
 }
 

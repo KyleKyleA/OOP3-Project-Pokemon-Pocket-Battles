@@ -8,10 +8,10 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
-  m_EditorHideFlags: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 12004, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: UnityEditor.dll::UnityEditor.ContainerWindow
   m_PixelRect:
     serializedVersion: 2
     x: 0
@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1920
     height: 1037
   m_ShowMode: 4
-  m_Title: Scene
+  m_Title: Console
   m_RootView: {fileID: 8}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -708,11 +708,8 @@ MonoBehaviour:
       m_Data: 49500
     m_ExpandedIDs:
     - m_Data: 0
-    - m_Data: 49168
-    - m_Data: 49170
-    - m_Data: 49172
-    - m_Data: 49174
-    - m_Data: 49176
+    - m_Data: 48686
+    - m_Data: 2147483647
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -745,11 +742,8 @@ MonoBehaviour:
       m_Data: 0
     m_ExpandedIDs:
     - m_Data: 0
-    - m_Data: 49168
-    - m_Data: 49170
-    - m_Data: 49172
-    - m_Data: 49174
-    - m_Data: 49176
+    - m_Data: 48686
+    - m_Data: 2147483647
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -914,7 +908,17 @@ MonoBehaviour:
       m_LastClickedID:
         m_Data: 0
       m_ExpandedIDs:
+      - m_Data: -5196
+      - m_Data: -5184
+      - m_Data: -2538
       - m_Data: -1314
+      - m_Data: 49066
+      - m_Data: 49612
+      - m_Data: 49632
+      - m_Data: 49652
+      - m_Data: 49670
+      - m_Data: 49678
+      - m_Data: 49686
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -1451,9 +1455,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: 597.06757, y: 182.84155, z: 0.62228423}
+    m_Target: {x: 1585.919, y: 249.7348, z: 2.117144}
     speed: 2
-    m_Value: {x: 597.06757, y: 182.84155, z: 0.62228423}
+    m_Value: {x: 1585.919, y: 249.7348, z: 2.117144}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1503,9 +1507,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 342.72678
+    m_Target: 193.24136
     speed: 2
-    m_Value: 342.72678
+    m_Value: 193.24136
   m_Ortho:
     m_Target: 1
     speed: 2

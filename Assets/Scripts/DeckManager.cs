@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
 
-
 // Author: Kyle Angeles, D'Andre, Karim, Alex
 // Date-Written 2026/4/8
 // File: DeckManager.cs
@@ -15,7 +14,9 @@ using UnityEngine;
 // We need JSON Connectivity for this script to save and load decks from the game into the player's screen
 public class DeckManager : MonoBehaviour
 {
-    
+    public static DeckManager Instance;
+    private DeckSearch.pokemonCard selectedDeck;
+
     // Deck Settings
     public int[] cardId;
     public int[] quantity;
@@ -28,12 +29,10 @@ public class DeckManager : MonoBehaviour
     public GameObject coll;
     public GameObject prefab;
 
-   
     // Different cards in each deck
     public int numberOfDifferentCards;
 
     public int numberOfDifferentDecks;
-
 
     // Number of decks and update lastAdded deck
     public int sum;
@@ -42,10 +41,18 @@ public class DeckManager : MonoBehaviour
 
     public int lastAdded;
 
-    
-
-
-
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -60,7 +67,7 @@ public class DeckManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     /// <summary>
@@ -86,7 +93,7 @@ public class DeckManager : MonoBehaviour
         sum = 0;
         numberOfDifferentCards = 0;
 
-        for (int i = 0; i < numberOfCardsInJson;i++)
+        for (int i = 0; i < numberOfCardsInJson; i++)
         {
             saveDeck[i] = PlayerPrefs.GetInt("deck" + i, 0);
         }
@@ -110,7 +117,7 @@ public class DeckManager : MonoBehaviour
     {
         dragged = 0;
     }
-    
+
 
     public void Card2()
     {
@@ -156,7 +163,7 @@ public class DeckManager : MonoBehaviour
         lastAdded = 0;
         int i = dragged;
 
-        if (cardId[i] >0 && alreadyCreated[i] == false)
+        if (cardId[i] > 0 && alreadyCreated[i] == false)
         {
             lastAdded = i;
             Instantiate(prefab, new Vector3(0, 0, 0), Quaternion.identity);
@@ -164,11 +171,20 @@ public class DeckManager : MonoBehaviour
 
             quantity[i] = 1;
 
-        } else if(cardId[i] > 0 && alreadyCreated[i] == true) {
-
+        }
+        else if (cardId[i] > 0 && alreadyCreated[i] == true)
+        {
             quantity[i]++;
         }
     }
 
+    public void SetSelectedDeck(DeckSearch.pokemonCard card)
+    {
+        selectedDeck = card;
+    }
 
+    public DeckSearch.pokemonCard GetSelectedDeck()
+    {
+        return selectedDeck;
+    }
 }

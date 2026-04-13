@@ -5,14 +5,17 @@ using UnityEngine;
 // Date-Written: 2026/4/9
 // Description: This script is responsible for handling player and AI turns during the game 
 // Features include the end turn button to handle the players and AI turns.
-public class TurnSystem : MonoBehaviour 
+public class TurnSystem : MonoBehaviour
 {
     public enum Player { PlayerOne, PlayerTwo }
 
-    public enum GameState { PlayerOneTurn, PlayerTwoTurn, Attack, GameOver };
+    public enum GameState { PlayerOneTurn, PlayerTwoTurn, Attack, GameOver }
 
     public GameState currentState;
     public Player currentPlayer;
+
+    public int playerOneHandCount = 0;
+    public int playerTwoHandCount = 0;
 
     // Player's at hand can only have 5 cards but a maxium of 30 cards within a deck
     public int startingHandSize = 5;
@@ -29,8 +32,6 @@ public class TurnSystem : MonoBehaviour
         DrawStartingHand(Player.PlayerTwo);
     }
 
-
-    //
     public void DrawStartingHand(Player player)
     {
         for (int i = 0; i < startingHandSize; i++)
@@ -46,20 +47,27 @@ public class TurnSystem : MonoBehaviour
     /// <param name="player"></param>
     public void drawCard(Player player)
     {
-        if (currentPlayer == Player.PlayerOne)
+        if (player == Player.PlayerOne)
         {
-            if (currentPlayer == Player.PlayerOne)
+            if (playerOneHandCount >= maxHandSize)
             {
-                if (playerHand.Count >= maxHandSize)
-                {
-                    Debug.Log("Player hand is full, and cannot draw another card");
-                    return;
-                }
+                Debug.Log("Player One hand is full and cannot draw another card");
+                return;
             }
 
+            playerOneHandCount++;
+            Debug.Log("Player One drew a card. Hand size: " + playerOneHandCount);
+        }
+        else if (player == Player.PlayerTwo)
+        {
+            if (playerTwoHandCount >= maxHandSize)
+            {
+                Debug.Log("Player Two hand is full and cannot draw another card");
+                return;
+            }
 
-
-           
+            playerTwoHandCount++;
+            Debug.Log("Player Two drew a card. Hand size: " + playerTwoHandCount);
         }
     }
 
@@ -86,7 +94,6 @@ public class TurnSystem : MonoBehaviour
     {
 
     }
-
 
     /// <summary>
     /// Function is required to make the card actually play and attack the opposing card.

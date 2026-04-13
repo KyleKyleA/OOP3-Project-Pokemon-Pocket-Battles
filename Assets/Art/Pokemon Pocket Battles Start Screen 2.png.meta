@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 28f0dc2cdbb26f64d93fc685551ebc43
+guid: 88c02bce321a61b4483f17b04f0028c2
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1838695985769079242
-    second: StartGame_0
+      213: 6438213151220967199
+    second: Pokemon Pocket Battles Start Screen 2_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: StartGame_0
+      name: Pokemon Pocket Battles Start Screen 2_0
       rect:
         serializedVersion: 2
         x: 0
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 63e1c462eb3ab76e0800000000000000
-      internalID: -1838695985769079242
+      spriteID: f1726caffb0295950800000000000000
+      internalID: 6438213151220967199
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      StartGame_0: -1838695985769079242
+      Pokemon Pocket Battles Start Screen 2_0: 6438213151220967199
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 // Author: Kyle Angeles
 // File: DeckSearch.cs
 // Date-Written: 2026/4/9 
-// Description: Deck search is reponsbile for searching player's deck or selection before starting the game
+// Description: Deck search is reponsible for searching player's deck or selection before starting the game
 // Theirs a search bar or some sort of UI element that allows players to filter, sort by or search decks on the page 1
 // of decks. This is only used at the start screen of the game.
 // Declaring a method for PokemonCard

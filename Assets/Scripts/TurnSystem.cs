@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Author: Kyle Angeles
+// Author: Kyle Angeles, Alex Tan
 // File: TurnSystem.cs
 // Date-Written: 2026/4/9
 // Description: This script is responsible for handling player and AI turns during the game 
@@ -20,6 +20,18 @@ public class TurnSystem : MonoBehaviour
     // Player's at hand can only have 5 cards but a maxium of 30 cards within a deck
     public int startingHandSize = 5;
     public int maxHandSize = 30;
+
+    // Player's once per turn actions
+    private bool hasAttachedEnergy = false;
+    private bool hasPlayedSupporterCard = false;
+    private bool hasEvolvedPokemon = false;
+
+    // UI Flags
+    public bool CanAttachEnergy() => !hasAttachedEnergy;
+    public bool CanPlayTrainer() => !hasPlayedSupporterCard;
+
+    //Is this the first turn?
+    private bool isFirstTurn = true;
 
     /// <summary>
     /// This would Display the current player's turn
@@ -108,6 +120,15 @@ public class TurnSystem : MonoBehaviour
     /// </summary>
     public void EndTurn()
     {
+        hasAttachedEnergy = false;
+        hasPlayedSupporterCard = false;
+        hasEvolvedPokemon = false;
+
+        if (isFirstTurn)
+        {
+            isFirstTurn = false;
+        }
+
         currentPlayer = (currentPlayer == Player.PlayerOne) ? Player.PlayerTwo : Player.PlayerOne;
         currentState = (currentPlayer == Player.PlayerOne) ? GameState.PlayerOneTurn : GameState.PlayerTwoTurn;
 

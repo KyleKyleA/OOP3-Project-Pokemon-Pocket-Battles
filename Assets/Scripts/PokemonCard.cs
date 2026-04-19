@@ -14,6 +14,9 @@ public class PokemonCard : Card
     [Header("Stats")]
     public int maxHp;
 
+    [Header("Sprite")]
+    public Sprite pokemonSprite;
+
     [Header("Evolution")]
     public PokemonCard evolvesFromCard; // Resolved at runtime from evolvesFromCardID
 
@@ -24,7 +27,6 @@ public class PokemonCard : Card
     public string abilityName;
     public string abilityDescription;
     public List<AbilityEffect> abilityEffects = new List<AbilityEffect>();
-    public bool abilityUsedThisTurn = false;
 
     [Header("Attached Energy")]
     public List<CardType> attachedEnergy = new List<CardType>();
@@ -60,12 +62,8 @@ public class PokemonCard : Card
     /// </summary>
     public void UseAbility(PokemonCard target, TurnSystem turnSystem)
     {
-        if (abilityUsedThisTurn) { Debug.Log("Ability already used this turn!"); return; }
-
         foreach (var effect in abilityEffects)
             effect.Execute(this, target, turnSystem);
-
-        abilityUsedThisTurn = true;
     }
 
     /// <summary>

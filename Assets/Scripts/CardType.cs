@@ -17,5 +17,5 @@ public class TypeEffectiveness
 {
     public int attackingTypeID;
     public int defendingTypeID;
-    public float modifier; // e.g. 2.0 for super effective, 0.5 for not very effective
+    public float modifier; // e.g. +20 for super effect attacks
 }

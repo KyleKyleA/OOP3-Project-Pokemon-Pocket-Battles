@@ -1,7 +1,8 @@
-using UnityEngine;
 using Unity.UI;
 using Unity.VectorGraphics;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.SocialPlatforms;
 // Author: Kyle Angeles
 // File: ScoreSystem.cs
 // Date-Written: 2026/4/16
@@ -15,45 +16,40 @@ public class ScoreSystem : MonoBehaviour
     private const int win_score = 3;
     // Variable Declaration
     // Scores for players are set to 0
-    private int playerOneScored = 0;
-    private int playerTwoScored = 0;
+    private int playerOneScore = 0;
+    private int playerTwoScore = 0;
 
 
 
     /// <summary>
-    /// Function Responsible for incrementing player one's score if they take defeated one card
-    /// from player two's 
+    /// Function Responsible for incrementing attacking player's score if pokemon knocked out
     /// </summary>
-    /// <param name="playerOneScored"></param>
-    public void AddPlayerOnePoint(int playerOneScored) 
+    /// <param name="playerOneScore"></param>
+    public void AddPoint(TurnSystem.Player player)
     {
-
-        playerOneScored++;
-        Debug.Log($"Player one has defeat player two's card. ");
-        Debug.Log($"Player one has earned a point: {playerOneScored}");
-    }
-
-    /// <summary>
-    /// Function helps with incrementing player two's score if they defeated one card
-    /// </summary>
-    /// <param name="playerTwoScored"></param>
-    public void AddPlayerTwoPoint(int playerTwoScored)
-    {
-        playerTwoScored++;
-        Debug.Log($"Player two has defeated player's two's card. ");
-        Debug.Log("Player Two has scored! a point. ");
+        if (player == TurnSystem.Player.PlayerOne)
+        {
+            playerOneScore++;
+            Debug.Log($"Player One scored. Total points: {playerOneScore}");
+        }
+        else
+        {
+            playerTwoScore++;
+            Debug.Log($"Player Two scored. Total points: {playerTwoScore}");
+        }
     }
 
 
-    // Check win condition after the game has been settled
+
+    // Check which player won after the game has been settled
     public void winCondition()
     {
 
-        if (playerOneScored >= win_score)
+        if (playerOneScore >= win_score)
         {
             Debug.Log("PLayer one has won the game");
         }
-        else if (playerTwoScored >= win_score)
+        else if (playerTwoScore >= win_score)
         {
             Debug.Log("Player two has won the game");
 
@@ -62,15 +58,20 @@ public class ScoreSystem : MonoBehaviour
             SceneManager.LoadScene("");
         }
 
-        
-    }
     
+    }
+
+    // Checks if there is a winner
+    public bool HasWinner()
+    {
+        return playerOneScore >= win_score || playerTwoScore >= win_score;
+    }
 
     // 
     public void resetScore()
     {
-        playerOneScored = 0;
-        playerTwoScored = 0;
+        playerOneScore = 0;
+        playerTwoScore = 0;
         Debug.Log("Scores have been resetted");
     }
 

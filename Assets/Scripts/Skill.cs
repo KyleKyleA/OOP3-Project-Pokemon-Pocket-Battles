@@ -14,4 +14,15 @@ public class Skill
 
     // From CardSkills junction table — defines whether this is the 1st or 2nd attack on the card
     public int skillOrder;
+
+    public bool CanUse(PokemonCard user)
+    {
+        if (user == null)
+            return false;
+
+        if (user.attachedEnergy.Count < energyCost)
+            return false;
+
+        return true;
+    }
 }

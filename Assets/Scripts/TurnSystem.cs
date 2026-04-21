@@ -10,6 +10,7 @@ public class TurnSystem : MonoBehaviour
     public enum Player { PlayerOne, PlayerTwo }
     public enum GameState { PlayerOneTurn, PlayerTwoTurn, Attack, GameOver }
 
+
     [Header("Game State")]
     public GameState currentState;
     public Player currentPlayer;
@@ -42,6 +43,10 @@ public class TurnSystem : MonoBehaviour
     // Is this the first turn?
     private bool isFirstTurn = true;
 
+    // UI Displays
+    public PokemonImageDisplayUI imageDisplay;
+    public PokemonStatsDisplayUI statsDisplay;
+
     // UI Flags
     public bool CanAttachEnergy() => !hasAttachedEnergy && currentState != GameState.GameOver;
     public bool CanPlayTrainer() => !hasPlayedSupporterCard && currentState != GameState.GameOver;
@@ -65,6 +70,9 @@ public class TurnSystem : MonoBehaviour
 
         DebugBattleState();
         BeginTurn();
+
+        //Temporary
+        RefreshUI();
     }
 
     public void DrawStartingHand(Player player)
@@ -108,6 +116,7 @@ public class TurnSystem : MonoBehaviour
     /// </summary>
     public void playPokemon()
     {
+        RefreshUI();
         Debug.Log("");
     }
 
@@ -136,6 +145,7 @@ public class TurnSystem : MonoBehaviour
         hasAttachedEnergy = true;
 
         Debug.Log(currentPlayer + " attached an energy to " + active.cardName + ". Total attached: " + active.attachedEnergy.Count);
+        RefreshUI();
     }
     // Active pokemon uses ability
     public void UseAbility()
@@ -181,6 +191,8 @@ public class TurnSystem : MonoBehaviour
         PokemonCard attacker = GetActivePokemon(currentPlayer);
         PokemonCard defender = GetOpponentPokemon(currentPlayer);
 
+        Skill skill = attacker.skills.Find(s => s.skillOrder == skillOrder);
+
         if (attacker == null || defender == null)
         {
             Debug.LogWarning("Attack failed because one side has no active Pokemon assigned.");
@@ -196,7 +208,7 @@ public class TurnSystem : MonoBehaviour
         // Check if skill is usable
         if (!attacker.CanUseSkill(skillOrder))
         {
-            Debug.LogWarning(attacker.cardName + " cannot use skill " + skillOrder);
+            Debug.Log(attacker.cardName + " doesn't have enough energy to use " + skill.skillName);
             return;
         }
 
@@ -204,6 +216,8 @@ public class TurnSystem : MonoBehaviour
 
         // Use the selected skill
         attacker.UseSkill(skillOrder, defender);
+
+        RefreshUI();
 
         if (defender.HasFainted())
         {
@@ -214,6 +228,7 @@ public class TurnSystem : MonoBehaviour
         // End turn after attack
         EndTurn();
         DebugBattleState();
+        RefreshUI();
     }
     /// <summary>
     /// Player ended their turn by choice or attacking.
@@ -301,9 +316,10 @@ public class TurnSystem : MonoBehaviour
             return;
         }
 
-        // Use the current ScoreSystem exactly as written.
+        // Add point to attacking player
         scoring.AddPoint(attackingPlayer);
 
+        // If a player has reached the winning amount, game ends
         if (scoring.HasWinner())
         {
             currentState = GameState.GameOver;
@@ -327,5 +343,11 @@ public class TurnSystem : MonoBehaviour
             : $"{playerTwoActivePokemon.cardName} HP {playerTwoActivePokemon.hp}/{playerTwoActivePokemon.maxHp} Energy {playerTwoActivePokemon.attachedEnergy.Count}";
 
         Debug.Log($"Battle State -> Current: {currentPlayer} | P1: {p1} | P2: {p2}");
+    }
+
+    private void RefreshUI()
+    {
+        statsDisplay?.Refresh();
+        imageDisplay?.Refresh();
     }
 }

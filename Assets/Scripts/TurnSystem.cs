@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static TurnSystem;
 
 // Author: Kyle Angeles, Alex Tan
 // File: TurnSystem.cs
@@ -9,6 +11,7 @@ public class TurnSystem : MonoBehaviour
 {
     public enum Player { PlayerOne, PlayerTwo }
     public enum GameState { PlayerOneTurn, PlayerTwoTurn, Attack, GameOver }
+
 
     [Header("Game State")]
     public GameState currentState;
@@ -20,12 +23,26 @@ public class TurnSystem : MonoBehaviour
     public AI aiController;
     public ScoreSystem scoreSystem;
 
+    [Header("Starting Decks")]
+    public List<Card> playerOneStartingDeck = new List<Card>();
+    public List<Card> playerTwoStartingDeck = new List<Card>();
+
+    [Header("Runtime Zones")]
+    public List<Card> playerOneDeck = new List<Card>();
+    public List<Card> playerTwoDeck = new List<Card>();
+    public List<Card> playerOneHand = new List<Card>();
+    public List<Card> playerTwoHand = new List<Card>();
+    public List<PokemonCard> playerOneBench = new List<PokemonCard>();
+    public List<PokemonCard> playerTwoBench = new List<PokemonCard>();
+
+
     // Hand count and max size
     [Header("Hand / Deck Test Values")]
     public int playerOneHandCount = 0;
     public int playerTwoHandCount = 0;
     public int startingHandSize = 5;
     public int maxHandSize = 10;
+    public int maxBenchSize = 3;
 
     // Testing purposes
     [Header("Testing Options")]
@@ -42,9 +59,28 @@ public class TurnSystem : MonoBehaviour
     // Is this the first turn?
     private bool isFirstTurn = true;
 
+    // UI Displays
+    public PokemonImageDisplayUI imageDisplay;
+    public PokemonStatsDisplayUI statsDisplay;
+    public BenchDisplayUI benchDisplay;
+
     // UI Flags
+    // Have I played an energy this turn?
     public bool CanAttachEnergy() => !hasAttachedEnergy && currentState != GameState.GameOver;
+    // Have I played a trainer this turn?
     public bool CanPlayTrainer() => !hasPlayedSupporterCard && currentState != GameState.GameOver;
+    // Can I play an active pokemon?
+    public bool CanPlayActivePokemon(Player player)
+    {
+        PokemonCard active = player == Player.PlayerOne ? playerOneActivePokemon : playerTwoActivePokemon;
+        return active == null;
+    }
+    // Can I bench a pokemon?
+    public bool CanBenchPokemon(Player player)
+    {
+        List<PokemonCard> bench = player == Player.PlayerOne ? playerOneBench : playerTwoBench;
+        return bench.Count < maxBenchSize;
+    }
 
     /// <summary>
     /// Initialize game start
@@ -65,6 +101,9 @@ public class TurnSystem : MonoBehaviour
 
         DebugBattleState();
         BeginTurn();
+
+        //Temporary
+        RefreshUI();
     }
 
     public void DrawStartingHand(Player player)
@@ -104,11 +143,41 @@ public class TurnSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Play selected basic pokemon card on active or bench slot
+    /// Tries to play selected basic pokemon card on active slot, then bench.
     /// </summary>
-    public void playPokemon()
+    public bool PlayPokemon(Player player, PokemonCard pokemon)
     {
-        Debug.Log("");
+        List<Card> hand = player == Player.PlayerOne ? playerOneHand : playerTwoHand;
+        List<PokemonCard> bench = player == Player.PlayerOne ? playerOneBench : playerTwoBench;
+        PokemonCard active = player == Player.PlayerOne ? playerOneActivePokemon : playerTwoActivePokemon;
+
+        // No active Pokémon yet -> set as active
+        if (CanPlayActivePokemon(player))
+        {
+            if (player == Player.PlayerOne)
+                playerOneActivePokemon = pokemon;
+            else
+                playerTwoActivePokemon = pokemon;
+
+            Debug.Log(player + " set active Pokémon: " + pokemon.cardName);
+            RefreshUI();
+            return true;
+        }
+
+        // Active already exists -> try to bench it
+        if (!CanBenchPokemon(player))
+        {
+            Debug.LogWarning(player + "'s bench is full.");
+            return false;
+        }
+
+        hand.Remove(pokemon);
+        bench.Add(pokemon);
+        Debug.Log(player + " benched " + pokemon.cardName);
+
+        RefreshUI();
+        benchDisplay?.Refresh();
+        return true;
     }
 
     /// <summary>
@@ -136,8 +205,8 @@ public class TurnSystem : MonoBehaviour
         hasAttachedEnergy = true;
 
         Debug.Log(currentPlayer + " attached an energy to " + active.cardName + ". Total attached: " + active.attachedEnergy.Count);
+        RefreshUI();
     }
-    
     // Active pokemon uses ability
     public void UseAbility()
     {
@@ -168,7 +237,6 @@ public class TurnSystem : MonoBehaviour
         user.UseAbility(target, this);
         hasUsedAbility = true;
     }
-    
     /// <summary>
     /// Active players turn can use active pokemon to Attack if cost is met.
     /// </summary>
@@ -182,6 +250,8 @@ public class TurnSystem : MonoBehaviour
 
         PokemonCard attacker = GetActivePokemon(currentPlayer);
         PokemonCard defender = GetOpponentPokemon(currentPlayer);
+
+        Skill skill = attacker.skills.Find(s => s.skillOrder == skillOrder);
 
         if (attacker == null || defender == null)
         {
@@ -198,7 +268,7 @@ public class TurnSystem : MonoBehaviour
         // Check if skill is usable
         if (!attacker.CanUseSkill(skillOrder))
         {
-            Debug.LogWarning(attacker.cardName + " cannot use skill " + skillOrder);
+            Debug.Log(attacker.cardName + " doesn't have enough energy to use " + skill.skillName);
             return;
         }
 
@@ -206,6 +276,9 @@ public class TurnSystem : MonoBehaviour
 
         // Use the selected skill
         attacker.UseSkill(skillOrder, defender);
+
+        RefreshUI();
+        benchDisplay?.Refresh();
 
         if (defender.HasFainted())
         {
@@ -217,7 +290,6 @@ public class TurnSystem : MonoBehaviour
         EndTurn();
         DebugBattleState();
     }
-    
     /// <summary>
     /// Player ended their turn by choice or attacking.
     /// </summary>
@@ -280,7 +352,6 @@ public class TurnSystem : MonoBehaviour
         else
             pokemon.attachedEnergy.Clear();
     }
-    
     /// <summary>
     /// Resets all once per turn action flags
     /// </summary>
@@ -305,9 +376,10 @@ public class TurnSystem : MonoBehaviour
             return;
         }
 
-        // Use the current ScoreSystem exactly as written.
+        // Add point to attacking player
         scoring.AddPoint(attackingPlayer);
 
+        // If a player has reached the winning amount, game ends
         if (scoring.HasWinner())
         {
             currentState = GameState.GameOver;
@@ -331,5 +403,11 @@ public class TurnSystem : MonoBehaviour
             : $"{playerTwoActivePokemon.cardName} HP {playerTwoActivePokemon.hp}/{playerTwoActivePokemon.maxHp} Energy {playerTwoActivePokemon.attachedEnergy.Count}";
 
         Debug.Log($"Battle State -> Current: {currentPlayer} | P1: {p1} | P2: {p2}");
+    }
+
+    private void RefreshUI()
+    {
+        statsDisplay?.Refresh();
+        imageDisplay?.Refresh();
     }
 }

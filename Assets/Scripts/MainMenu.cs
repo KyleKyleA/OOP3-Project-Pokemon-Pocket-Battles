@@ -2,9 +2,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
-// Author: 
-// File:
-// Date Written:
+// Author: Kyle Angeles, Alex Tan, D'Andre, Karim
+// File: MainMenu.cs
+// Date Written: 2026/4/3
 // Description:
 public class MainMenu : MonoBehaviour
 {

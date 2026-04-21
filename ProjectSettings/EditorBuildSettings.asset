@@ -9,14 +9,17 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: 926b6b00b96076844a97c5f6136aac94
   - enabled: 1
-    path: Assets/Scenes/PokePocketBattles.unity
-    guid: 64dc57b7c2b4b6540a19f38e76b18b7e
+    path: Assets/Scenes/BattleTestScene.unity
+    guid: ece8bad41cc11c54c8c44540d671ba31
   - enabled: 1
     path: Assets/Scenes/GameRules.unity
     guid: 1561c086da5d842469000144d814fe98
   - enabled: 1
     path: Assets/Scenes/Decks.unity
     guid: 13fadfb58ab3a43408307e8961dd1384
+  - enabled: 1
+    path: Assets/Scenes/Winning Scene.unity
+    guid: fcb00a5d48845b845a5330f604bb0f8a
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

@@ -32,6 +32,7 @@ public class ScoreSystem : MonoBehaviour
     private int playerTwoScore = 0;
 
 
+    // Color for the score board UI
     public Color scoredColor = Color.red;
     public Color unscoredColor = Color.grey;
     

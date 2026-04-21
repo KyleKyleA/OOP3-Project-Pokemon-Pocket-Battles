@@ -79,16 +79,17 @@ public class ScoreSystem : MonoBehaviour
     /// Once the condition has been setteled display a winning screen to 
     /// the usre that they have work the game.
     /// </summary>
-    public void winCondition()
+    public void winCondition(TurnSystem.Player player)
     {
 
-        if (playerOneScore >= win_score)
+
+        if (player == TurnSystem.Player.PlayerOne)
         {
-            Debug.Log("PLayer one has won the game");
+            Debug.Log("Player one has won the game");
             PlayerPrefs.SetString("Winner", "Player One");
             SceneManager.LoadSceneAsync(4);
         }
-        else if (playerTwoScore >= win_score)
+        else if (player == TurnSystem.Player.PlayerTwo)
         {
             Debug.Log("Player two has won the game");
             PlayerPrefs.SetString("Winner", "Player Two");

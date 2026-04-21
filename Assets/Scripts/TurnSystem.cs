@@ -82,6 +82,13 @@ public class TurnSystem : MonoBehaviour
         return bench.Count < maxBenchSize;
     }
 
+    // Is bench empty?
+    public bool isBenchEmpty(Player player)
+    {
+        List<PokemonCard> bench = player == Player.PlayerOne ? playerTwoBench : playerOneBench;
+        return bench.Count == 0;
+    }
+
     /// <summary>
     /// Initialize game start
     /// </summary>
@@ -381,11 +388,13 @@ public class TurnSystem : MonoBehaviour
         // Add point to attacking player
         scoring.AddPoint(attackingPlayer);
 
-        // If a player has reached the winning amount, game ends
-        if (scoring.HasWinner())
+        Debug.LogWarning(isBenchEmpty(attackingPlayer));
+
+        // If a player has reached the winning amount or if the defending player has no replacement pokemon, game ends
+        if (scoring.HasWinner() || isBenchEmpty(attackingPlayer))
         {
             currentState = GameState.GameOver;
-            scoring.winCondition();
+            scoring.winCondition(attackingPlayer);
             return;
         }
 

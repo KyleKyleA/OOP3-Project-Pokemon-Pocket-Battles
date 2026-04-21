@@ -17,6 +17,10 @@ public class DeckManager : MonoBehaviour
     public static DeckManager Instance;
     private DeckSearch.pokemonCard selectedDeck;
 
+    // This is the player's active deck that will be used in the game. It will be populated with the cards that the player has selected in the deck screen and will be used to draw cards from during the game.
+    public List<CardData> activeDeck = new List<CardData>();
+    public int maxDeckSize = 30;
+
     // Deck Settings
     public int[] cardId;
     public int[] quantity;
@@ -41,6 +45,7 @@ public class DeckManager : MonoBehaviour
 
     public int lastAdded;
 
+    // This will be responsible for creating a new deck and saving it to the player's screen.
     void Awake()
     {
         if (Instance == null)
@@ -54,7 +59,6 @@ public class DeckManager : MonoBehaviour
         }
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         sum = 0;
@@ -64,17 +68,15 @@ public class DeckManager : MonoBehaviour
         saveDeck = new int[numberOfCardsInJson];
     }
 
-    // Update is called once per frame
     void Update()
     {
 
     }
 
-    /// <summary>
-    /// This allows the user to create decks and adding in cards
-    /// </summary>
+    
     public void CreateDeck()
     {
+        // This function will be responsible for creating a new deck and saving it to the player's screen. 
         for (int i = 0; i < quantity.Length; i++)
         {
             sum += quantity[i];
@@ -100,19 +102,20 @@ public class DeckManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Function to add deck button
-    /// this would allow the user to add/creat decks
-    /// </summary>
+    /// This function will be responsible for selecting a deck from the player's screen and saving it to the player's screen
+    /// <summmary>
     public void addDeck()
     {
         mouseOverDeck = true;
     }
 
+    // This is for exiting the deck screen and going back to the main menu
     public void Exit()
     {
         mouseOverDeck = false;
     }
 
+    // this will be for populating the deck list 
     public void Card1()
     {
         dragged = 0;
@@ -130,7 +133,7 @@ public class DeckManager : MonoBehaviour
     }
 
 
-    // Drop or deleting a card
+    // this is for dropping the card into the deck and saving it to the player's screen 
     public void drop()
     {
         Collection collection = coll.GetComponent<Collection>();
@@ -154,10 +157,7 @@ public class DeckManager : MonoBehaviour
         }
     }
 
-
-    /// <summary>
-    /// Function 
-    /// </summary>
+    // calculates the drop of the card into the deck and saves it to the player's screen
     public void CalculateDrop()
     {
         lastAdded = 0;
@@ -178,6 +178,7 @@ public class DeckManager : MonoBehaviour
         }
     }
 
+    // selecting a deck from the player's screen and saving it to the player's screen 
     public void SetSelectedDeck(DeckSearch.pokemonCard card)
     {
         selectedDeck = card;
@@ -186,5 +187,26 @@ public class DeckManager : MonoBehaviour
     public DeckSearch.pokemonCard GetSelectedDeck()
     {
         return selectedDeck;
+    }
+
+    /// <summary>
+    /// Pulls the top card from the player's active deck and removes it from the list.
+    /// </summary>
+    public CardData DrawCard()
+    {
+        // Check if there are actually cards left in the deck
+        if (activeDeck.Count > 0)
+        {
+            // Get the card at the top of the deck
+            CardData drawnCard = activeDeck[0];
+            
+            // Remove it from the deck so we don't draw the exact same card again
+            activeDeck.RemoveAt(0); 
+            
+            return drawnCard;
+        }
+        
+        // If the deck is empty, return nothing
+        return null; 
     }
 }

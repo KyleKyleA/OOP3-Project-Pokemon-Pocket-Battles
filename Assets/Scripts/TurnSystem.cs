@@ -1,353 +1,165 @@
-using System.Linq;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
-// Author: Kyle Angeles, Alex Tan
-// File: TurnSystem.cs
-// Date-Written: 2026/4/9
-// Description: Handles a turn-by-turn battle loop 
+// Author: Kyle Angeles, Alex Tan, Karim El Moussadeq
+// description: this file is for the turn system of the game. it handles the flow of the game, 
+//including player turns, drawing cards, playing Pokemon, attacking, and ending turns. 
+//It also interacts with the AI for the opponent's turn and updates the UI accordingly.
+
 public class TurnSystem : MonoBehaviour
 {
     public enum Player { PlayerOne, PlayerTwo }
     public enum GameState { PlayerOneTurn, PlayerTwoTurn, Attack, GameOver }
 
-
+    // game state variables
     [Header("Game State")]
     public GameState currentState;
     public Player currentPlayer;
 
+    // Battle variables
     [Header("Battle Setup")]
     public PokemonCard playerOneActivePokemon;
     public PokemonCard playerTwoActivePokemon;
     public AI aiController;
     public ScoreSystem scoreSystem;
 
-    // Hand count and max size
-    [Header("Hand / Deck Test Values")]
+    // hand lists 
+    [Header("Hand Lists")]
+    public List<Card> playerOneHand = new List<Card>();
+    public List<Card> playerTwoHand = new List<Card>();
+    
     public int playerOneHandCount = 0;
     public int playerTwoHandCount = 0;
     public int startingHandSize = 5;
     public int maxHandSize = 10;
 
-    // Testing purposes
-    [Header("Testing Options")]
-    public bool drawAtStartOfTurn = true;
-    public CardType defaultEnergyType;
-
-    // Once per turn action flags
-    private bool hasAttachedEnergy = false;
-    private bool hasPlayedSupporterCard = false;
-    private bool hasEvolvedPokemon = false;
-    private bool hasUsedAbility = false;
-    private bool hasRetreatedPokemon = false;
-
-    // Is this the first turn?
-    private bool isFirstTurn = true;
-
-    // UI Displays
+    // UI variables
+    [Header("UI Visuals")]
+    public GameObject pokemonCardPrefab; // This prefab should have the Card script attached
+    public Transform playerOneHandArea;
+    public Transform playerTwoHandArea;
+    public Transform playerOneBenchArea;
     public PokemonImageDisplayUI imageDisplay;
     public PokemonStatsDisplayUI statsDisplay;
 
-    // UI Flags
-    public bool CanAttachEnergy() => !hasAttachedEnergy && currentState != GameState.GameOver;
-    public bool CanPlayTrainer() => !hasPlayedSupporterCard && currentState != GameState.GameOver;
+    // Deck variables
+    [Header("Settings")]
+    public bool drawAtStartOfTurn = true;
+    public CardType defaultEnergyType;
 
-    /// <summary>
-    /// Initialize game start
-    /// </summary>
+    private bool hasAttachedEnergy = false;
+    private bool isFirstTurn = true;
+
+    // Start is called before the first frame update
     void Start()
     {
-        if (scoreSystem == null)
-            scoreSystem = ScoreSystem.instance;
-
+        if (scoreSystem == null) scoreSystem = ScoreSystem.instance;
         currentPlayer = Player.PlayerOne;
         currentState = GameState.PlayerOneTurn;
 
         DrawStartingHand(Player.PlayerOne);
         DrawStartingHand(Player.PlayerTwo);
-
-        InitializePokemonState(playerOneActivePokemon);
-        InitializePokemonState(playerTwoActivePokemon);
-
-        DebugBattleState();
         BeginTurn();
-
-        //Temporary
-        RefreshUI();
     }
 
-    public void DrawStartingHand(Player player)
-    {
-        for (int i = 0; i < startingHandSize; i++)
-            drawCard(player);
-    }
+    // Method to draw the starting hand for each player at the beginning of the game
+    public void DrawStartingHand(Player player) { for (int i = 0; i < startingHandSize; i++) drawCard(player); }
 
-    /// <summary>
-    /// drawing card method this would determine player draws a card and adds it to the players hand
-    /// call this at the start of each turn 
-    /// </summary>
+    // Method to draw a card for the specified player, with checks for hand size limits and null card data
     public void drawCard(Player player)
     {
-        if (player == Player.PlayerOne)
-        {
-            if (playerOneHandCount >= maxHandSize)
-            {
-                Debug.Log("Player One hand is full and cannot draw another card");
-                return;
-            }
+        if ((player == Player.PlayerOne && playerOneHandCount >= maxHandSize) || 
+            (player == Player.PlayerTwo && playerTwoHandCount >= maxHandSize)) return;
 
-            playerOneHandCount++;
-            Debug.Log("Player One drew a card. Hand size: " + playerOneHandCount);
-        }
-        else
-        {
-            if (playerTwoHandCount >= maxHandSize)
-            {
-                Debug.Log("Player Two hand is full and cannot draw another card");
-                return;
-            }
+        CardData drawnData = DeckManager.Instance?.DrawCard();
+        if (drawnData == null) return;
 
-            playerTwoHandCount++;
-            Debug.Log("Player Two drew a card. Hand size: " + playerTwoHandCount);
+        if (player == Player.PlayerOne) playerOneHandCount++; else playerTwoHandCount++;
+
+        if (pokemonCardPrefab != null)
+        {
+            Transform hand = (player == Player.PlayerOne) ? playerOneHandArea : playerTwoHandArea;
+            GameObject visual = Instantiate(pokemonCardPrefab, hand);
+            
+            // Get the generic Card component
+            Card script = visual.GetComponent<Card>();
+            if (script != null)
+            {
+                script.cardName = drawnData.name;
+                
+                // Add to the generic list Alex asked for
+                if (player == Player.PlayerOne) playerOneHand.Add(script); 
+                else playerTwoHand.Add(script);
+
+                // If it happens to be a Pokemon, set those specific stats
+                PokemonCard pkmnScript = script as PokemonCard;
+                if (pkmnScript != null)
+                {
+                    pkmnScript.hp = drawnData.hp;
+                    pkmnScript.maxHp = drawnData.hp;
+                }
+            }
         }
     }
 
-    /// <summary>
-    /// Play selected basic pokemon card on active or bench slot
-    /// </summary>
-    public void playPokemon()
+    public void playPokemon(GameObject cardObj)
     {
-        RefreshUI();
-        Debug.Log("");
-    }
+        // Identify the card types
+        Card baseCard = cardObj.GetComponent<Card>();
+        PokemonCard pkmnCard = cardObj.GetComponent<PokemonCard>();
 
-    /// <summary>
-    /// Each Turn a player must attach an energy to one of their bench or played pokemon card
-    /// </summary>
-    public void AttachEnergy()
-    {
-        if (currentState == GameState.GameOver)
-            return;
-
-        if (!CanAttachEnergy())
+        // If it's a Pokemon, play it to the appropriate area
+        if (pkmnCard != null)
         {
-            Debug.Log("Energy has already been attached this turn.");
-            return;
+            if (playerOneActivePokemon == null) playerOneActivePokemon = pkmnCard;
+            else cardObj.transform.SetParent(playerOneBenchArea);
         }
 
-        PokemonCard active = GetActivePokemon(currentPlayer);
-        if (active == null)
-        {
-            Debug.LogWarning("No active Pokemon found for " + currentPlayer);
-            return;
-        }
-
-        active.attachedEnergy.Add(defaultEnergyType);
-        hasAttachedEnergy = true;
-
-        Debug.Log(currentPlayer + " attached an energy to " + active.cardName + ". Total attached: " + active.attachedEnergy.Count);
+        // Remove from hand data regardless of type
+        if (currentPlayer == Player.PlayerOne) { playerOneHandCount--; playerOneHand.Remove(baseCard); }
+        else { playerTwoHandCount--; playerTwoHand.Remove(baseCard); }
+        
         RefreshUI();
     }
-    // Active pokemon uses ability
-    public void UseAbility()
-    {
-        if (currentState == GameState.GameOver)
-            return;
 
-        PokemonCard user = GetActivePokemon(currentPlayer);
-        PokemonCard target = GetOpponentPokemon(currentPlayer);
-
-        if (user == null)
-        {
-            Debug.LogWarning("No active Pokemon available to use an ability.");
-            return;
-        }
-
-        if (isFirstTurn && currentPlayer == Player.PlayerOne)
-        {
-            Debug.Log("Player One cannot use an ability on the opening turn in this test setup.");
-            return;
-        }
-
-        if (user.abilityEffects == null || user.abilityEffects.Count == 0)
-        {
-            Debug.Log(user.cardName + " has no ability effects configured.");
-            return;
-        }
-
-        user.UseAbility(target, this);
-        hasUsedAbility = true;
-    }
-    /// <summary>
-    /// Active players turn can use active pokemon to Attack if cost is met.
-    /// </summary>
+    // This method handles the attack action when a player chooses to attack with their active Pokemon.
     public void Attack(int skillOrder)
     {
-        if (currentState == GameState.GameOver)
-        {
-            Debug.Log("Game is over. No more attacks can be made.");
-            return;
-        }
-
+        
         PokemonCard attacker = GetActivePokemon(currentPlayer);
         PokemonCard defender = GetOpponentPokemon(currentPlayer);
-
-        Skill skill = attacker.skills.Find(s => s.skillOrder == skillOrder);
-
-        if (attacker == null || defender == null)
+        if (attacker != null && defender != null)
         {
-            Debug.LogWarning("Attack failed because one side has no active Pokemon assigned.");
-            return;
+            Skill skill = attacker.skills.Find(s => s.skillOrder == skillOrder);
+            if (skill != null) attacker.UseSkill(skillOrder, defender);
         }
-
-        if (attacker.HasFainted())
-        {
-            Debug.LogWarning(attacker.cardName + " has fainted and cannot attack.");
-            return;
-        }
-
-        // Check if skill is usable
-        if (!attacker.CanUseSkill(skillOrder))
-        {
-            Debug.Log(attacker.cardName + " doesn't have enough energy to use " + skill.skillName);
-            return;
-        }
-
-        currentState = GameState.Attack;
-
-        // Use the selected skill
-        attacker.UseSkill(skillOrder, defender);
-
         RefreshUI();
-
-        if (defender.HasFainted())
-        {
-            HandleKnockout(currentPlayer, defender);
-            return;
-        }
-
-        // End turn after attack
-        EndTurn();
-        DebugBattleState();
-        RefreshUI();
+        if (defender != null && defender.HasFainted()) HandleKnockout(currentPlayer, defender); else EndTurn();
     }
-    /// <summary>
-    /// Player ended their turn by choice or attacking.
-    /// </summary>
+
+    // This method handles the attachment of energy cards to the active Pokemon.
     public void EndTurn()
     {
-        if (currentState == GameState.GameOver)
-            return;
-
-        currentPlayer = currentPlayer == Player.PlayerOne ? Player.PlayerTwo : Player.PlayerOne;
-        currentState = currentPlayer == Player.PlayerOne ? GameState.PlayerOneTurn : GameState.PlayerTwoTurn;
-
-        if (isFirstTurn)
-            isFirstTurn = false;
-
-        Debug.Log(currentPlayer + "'s turn");
+        // Reset energy attachment status and switch the current player
+        isFirstTurn = false;
+        currentPlayer = (currentPlayer == Player.PlayerOne) ? Player.PlayerTwo : Player.PlayerOne;
         BeginTurn();
     }
 
+    // This method initiates the beginning of a player's turn. 
     public void BeginTurn()
     {
-        if (currentState == GameState.GameOver)
-            return;
-
-        ResetPerTurnFlagsForCurrentPlayer();
-
-        if (drawAtStartOfTurn)
-        {
-            bool shouldDraw = !isFirstTurn;
-            if (shouldDraw)
-                drawCard(currentPlayer);
-        }
-
-        DebugBattleState();
-
-        // If it's AI's turn, let AI play.
-        if (currentPlayer == Player.PlayerTwo)
-            aiController.ExecuteAITurn();
-    }
-
-    public PokemonCard GetActivePokemon(Player player)
-    {
-        return player == Player.PlayerOne ? playerOneActivePokemon : playerTwoActivePokemon;
-    }
-
-    public PokemonCard GetOpponentPokemon(Player player)
-    {
-        return player == Player.PlayerOne ? playerTwoActivePokemon : playerOneActivePokemon;
-    }
-
-    private void InitializePokemonState(PokemonCard pokemon)
-    {
-        if (pokemon == null)
-            return;
-
-        pokemon.hp = pokemon.maxHp;
-        pokemon.currentStatus = StatusEffect.Status.None;
-
-        if (pokemon.attachedEnergy == null)
-            pokemon.attachedEnergy = new System.Collections.Generic.List<CardType>();
-        else
-            pokemon.attachedEnergy.Clear();
-    }
-    /// <summary>
-    /// Resets all once per turn action flags
-    /// </summary>
-    private void ResetPerTurnFlagsForCurrentPlayer()
-    {
         hasAttachedEnergy = false;
-        hasPlayedSupporterCard = false;
-        hasEvolvedPokemon = false;
-        hasUsedAbility = false;
-        hasRetreatedPokemon = false;
+        if (!isFirstTurn && drawAtStartOfTurn) drawCard(currentPlayer);
+        if (currentPlayer == Player.PlayerTwo) aiController.ExecuteAITurn();
+        RefreshUI();
     }
-
-    private void HandleKnockout(Player attackingPlayer, PokemonCard faintedPokemon)
-    {
-        Debug.Log(faintedPokemon.cardName + " was knocked out by " + attackingPlayer);
-
-        ScoreSystem scoring = scoreSystem != null ? scoreSystem : ScoreSystem.instance;
-        if (scoring == null)
-        {
-            Debug.LogWarning("No ScoreSystem found. Ending test battle.");
-            currentState = GameState.GameOver;
-            return;
-        }
-
-        // Add point to attacking player
-        scoring.AddPoint(attackingPlayer);
-
-        // If a player has reached the winning amount, game ends
-        if (scoring.HasWinner())
-        {
-            currentState = GameState.GameOver;
-            scoring.winCondition();
-            return;
-        }
-
-        // Until bench / replacement is implemented, end the test battle after a knockout.
-        currentState = GameState.GameOver;
-        Debug.Log("Point awarded through ScoreSystem. Battle ended because replacement Pokemon is not implemented yet.");
-    }
-
-    public void DebugBattleState()
-    {
-        string p1 = playerOneActivePokemon == null
-            ? "None"
-            : $"{playerOneActivePokemon.cardName} HP {playerOneActivePokemon.hp}/{playerOneActivePokemon.maxHp} Energy {playerOneActivePokemon.attachedEnergy.Count}";
-
-        string p2 = playerTwoActivePokemon == null
-            ? "None"
-            : $"{playerTwoActivePokemon.cardName} HP {playerTwoActivePokemon.hp}/{playerTwoActivePokemon.maxHp} Energy {playerTwoActivePokemon.attachedEnergy.Count}";
-
-        Debug.Log($"Battle State -> Current: {currentPlayer} | P1: {p1} | P2: {p2}");
-    }
-
-    private void RefreshUI()
-    {
-        statsDisplay?.Refresh();
-        imageDisplay?.Refresh();
-    }
+    
+    public void AttachEnergy() { RefreshUI(); }
+    public void UseAbility() { }
+    private void HandleKnockout(Player p, PokemonCard f) { scoreSystem?.AddPoint(p); EndTurn(); }
+    public PokemonCard GetActivePokemon(Player p) => (p == Player.PlayerOne) ? playerOneActivePokemon : playerTwoActivePokemon;
+    public PokemonCard GetOpponentPokemon(Player p) => (p == Player.PlayerOne) ? playerTwoActivePokemon : playerOneActivePokemon;
+    private void RefreshUI() { statsDisplay?.Refresh(); imageDisplay?.Refresh(); }
 }

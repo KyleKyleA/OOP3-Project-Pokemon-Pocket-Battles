@@ -1184,7 +1184,7 @@ MonoBehaviour:
     typeName: 
   imageUrl: 
   maxHp: 60
-  pokemonSprite: {fileID: 0}
+  pokemonSprite: {fileID: 3113819469898044906, guid: 3b6d741b4536b7243aeb25d77232d56b, type: 3}
   evolvesFromCard: {fileID: 0}
   skills:
   - skillID: 0
@@ -1712,7 +1712,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
+          m_IntArgument: 2
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -2400,7 +2400,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AI
   turnSystem: {fileID: 0}
-  useAbilityBeforeAttack: 1
   turnDelaySeconds: 0.75
 --- !u!4 &666059946
 Transform:
@@ -3190,7 +3189,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -3597,11 +3596,11 @@ MonoBehaviour:
     typeName: 
   imageUrl: 
   maxHp: 60
-  pokemonSprite: {fileID: 0}
+  pokemonSprite: {fileID: -748788784490847103, guid: 2dd3c66b315ad9246b5b6c4901a72574, type: 3}
   evolvesFromCard: {fileID: 0}
   skills:
   - skillID: 0
-    skillName: Gnar
+    skillName: Gnaw
     damage: 20
     description: 
     energyCost: 1
@@ -4147,7 +4146,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AI
   turnSystem: {fileID: 1490564831}
-  useAbilityBeforeAttack: 1
   turnDelaySeconds: 0.75
 --- !u!114 &1707444917
 MonoBehaviour:
@@ -4206,9 +4204,9 @@ MonoBehaviour:
   defaultEnergyType:
     typeID: 0
     typeName: 
-  imageDisplay: {fileID: 0}
-  statsDisplay: {fileID: 0}
-  benchDisplay: {fileID: 0}
+  imageDisplay: {fileID: 1707444915}
+  statsDisplay: {fileID: 1707444920}
+  benchDisplay: {fileID: 1707444921}
 --- !u!4 &1707444919
 Transform:
   m_ObjectHideFlags: 0

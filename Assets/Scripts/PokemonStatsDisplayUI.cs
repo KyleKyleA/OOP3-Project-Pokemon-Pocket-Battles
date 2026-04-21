@@ -21,6 +21,7 @@ public class PokemonStatsDisplayUI : MonoBehaviour
 
     public void Refresh()
     {
+        UnityEngine.Debug.Log("Refresh called");
         if (turnSystem == null)
             return;
 

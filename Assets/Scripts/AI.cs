@@ -23,7 +23,7 @@ public class AI : MonoBehaviour
             
             if (pokemonToPlay != null)
             {
-                turnSystem.playPokemon(pokemonToPlay.gameObject);
+                //turnSystem.PlayPokemon(pokemonToPlay.gameObject);
                 Debug.Log($"AI played {pokemonToPlay.cardName} to the Active slot.");
             }
             else

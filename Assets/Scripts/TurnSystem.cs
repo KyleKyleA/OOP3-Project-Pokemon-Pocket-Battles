@@ -205,6 +205,8 @@ public class TurnSystem : MonoBehaviour
         hasAttachedEnergy = true;
 
         Debug.Log(currentPlayer + " attached an energy to " + active.cardName + ". Total attached: " + active.attachedEnergy.Count);
+        Debug.Log("After AttachEnergy -> " + active.cardName +
+          " Energy: " + active.attachedEnergy.Count);
         RefreshUI();
     }
     // Active pokemon uses ability
@@ -268,7 +270,7 @@ public class TurnSystem : MonoBehaviour
         // Check if skill is usable
         if (!attacker.CanUseSkill(skillOrder))
         {
-            Debug.Log(attacker.cardName + " doesn't have enough energy to use " + skill.skillName);
+            Debug.Log(attacker.cardName + " doesn't have enough energy to use " + skill);
             return;
         }
 
@@ -407,7 +409,21 @@ public class TurnSystem : MonoBehaviour
 
     private void RefreshUI()
     {
-        statsDisplay?.Refresh();
-        imageDisplay?.Refresh();
+        Debug.Log("RefreshUI called");
+
+        if (statsDisplay == null)
+            Debug.Log("statsDisplay is NULL");
+        else
+            statsDisplay.Refresh();
+
+        if (imageDisplay == null)
+            Debug.Log("imageDisplay is NULL");
+        else
+            imageDisplay.Refresh();
+
+        if (benchDisplay == null)
+            Debug.Log("benchDisplay is NULL");
+        else
+            benchDisplay.Refresh();
     }
 }
